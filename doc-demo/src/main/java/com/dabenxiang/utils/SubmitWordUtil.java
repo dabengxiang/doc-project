@@ -15,12 +15,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * project name : doc-project
- * Date:2018/8/23
- * Author: yc.guo
- * DESC:
+ * Date:2018/10/13
+ * Author: yc.guo the one whom in nengxun
+ * Desc:
  */
-public class WordDemo {
+public class SubmitWordUtil  {
 
     private String templatePath = "";
     private FileInputStream is = null;
@@ -29,7 +28,7 @@ public class WordDemo {
     private OutputStream os = null;
 
 
-    public WordDemo(String templatePath) {
+    public SubmitWordUtil(String templatePath) {
         this.templatePath = templatePath;
 
     }
@@ -180,7 +179,7 @@ public class WordDemo {
                     path = pic.get("path").toString();
                 }
 
-                //模板样式				
+                //模板样式
                 XWPFRun tempRun = null;
                 // 直接调用XWPFRun的setText()方法设置文本时，在底层会重新创建一个XWPFRun，把文本附加在当前文本后面，
                 // 所以我们不能直接设值，需要先删除当前run,然后再自己手动插入一个新的run。
@@ -245,7 +244,7 @@ public class WordDemo {
 
 
     /**
-     * 根据图片类型，取得对应的图片类型代码 
+     * 根据图片类型，取得对应的图片类型代码
      * @param picType
      * @return int
      */
@@ -271,13 +270,13 @@ public class WordDemo {
 
     private InputStream getPicStream(String picPath) throws Exception{
         URL url = new URL(picPath);
-        //打开链接  
+        //打开链接
         HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-        //设置请求方式为"GET"  
+        //设置请求方式为"GET"
         conn.setRequestMethod("GET");
-        //超时响应时间为5秒  
+        //超时响应时间为5秒
         conn.setConnectTimeout(5 * 1000);
-        //通过输入流获取图片数据  
+        //通过输入流获取图片数据
         InputStream is = conn.getInputStream();
         return is;
     }
@@ -659,37 +658,25 @@ public class WordDemo {
     }
 
 
-    public static void writeXWPFDocument(){
+
+
+
+
+    public static void writeXWPFDocument(String[][] data){
 
         try {
             //创建一个word文档
-            XWPFDocument xwpfDocument = new XWPFDocument();
             FileOutputStream outputStream  = new FileOutputStream("C:\\Users\\dabenxiang\\Desktop\\word1.docx");
-            /**
-             * 创建一个段落
-             */
-            XWPFParagraph paragraph = xwpfDocument.createParagraph();
-            XWPFRun run = paragraph.createRun();
-            run.setText("德玛西亚！！");
-            //加粗
-            run.setBold(true);
-
-            run = paragraph.createRun();
-            run.setText("艾欧尼亚");
-            run.setColor("fff000");
+            XWPFDocument xwpfDocument = createTable();
 
 
             /**
              * 创建一个table
              */
             //创建一个10行10列的表格
-            XWPFTable table =xwpfDocument.createTable(10, 10);
-//            table.createRow();
-//            table.createRow();
-            //添加新的一列
-            table.addNewCol();
-            //添加新的一行
-//            table.createRow();
+            XWPFTable table =xwpfDocument.createTable(data.length, data[0].length);
+            setTableWidth(table,"2000");
+
             //获取表格属性
             CTTblPr tablePr = table.getCTTbl().addNewTblPr();
             //获取表格宽度
@@ -704,28 +691,47 @@ public class WordDemo {
             List<XWPFTableRow> rowList = table.getRows();
             XWPFTableRow row;
             row = rowList.get(0);
-            row.setHeight(2000);
-            //为这一行增加一列
-            row.addNewTableCell();
-            //获取行属性
-            CTTrPr rowPr = row.getCtRow().addNewTrPr();
-            row.getCtRow();
 
-            /**
-             * 获取表格中的列  以及设计列样式
-             */
-            //获取某个单元格
-            XWPFTableCell cell ;
-            cell = row.getCell(0);
-            cell.setText("第一行\r\n第一列");
-            //单元格背景颜色
-            cell.setColor("676767");
-            //获取单元格样式
-            CTTcPr cellPr = cell.getCTTc().addNewTcPr();
-            //表格内容垂直居中
-            cellPr.addNewVAlign().setVal(STVerticalJc.CENTER);
-            //设置单元格的宽度
-            cellPr.addNewTcW().setW(BigInteger.valueOf(5000));
+
+            List<XWPFTableCell> tableCells = row.getTableCells();
+
+            for (XWPFTableCell tableCell : tableCells) {
+                setTitleRow(tableCell);
+            }
+
+
+//            rowPr.
+
+//            row.setHeight(2000);
+
+
+
+
+
+
+
+
+            //为这一行增加一列
+//            row.addNewTableCell();
+//            //获取行属性
+//            CTTrPr rowPr = row.getCtRow().addNewTrPr();
+//            row.getCtRow();
+//
+//            /**
+//             * 获取表格中的列  以及设计列样式
+//             */
+//            //获取某个单元格
+//            XWPFTableCell cell ;
+//            cell = row.getCell(0);
+//            cell.setText("第一行\r\n第一列");
+//            //单元格背景颜色
+//            cell.setColor("676767");
+//            //获取单元格样式
+//            CTTcPr cellPr = cell.getCTTc().addNewTcPr();
+//            //表格内容垂直居中
+//            cellPr.addNewVAlign().setVal(STVerticalJc.CENTER);
+//            //设置单元格的宽度
+//            cellPr.addNewTcW().setW(BigInteger.valueOf(5000));
 
 
             xwpfDocument.write(outputStream);
@@ -737,8 +743,39 @@ public class WordDemo {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+
     public static void main(String[] args) {
-        writeXWPFDocument();
+        String[][] table = new String[3][5];
+
+
+        table[0][0] = "标题";
+        table[0][1] = null;
+        table[0][2] = null;
+        table[0][3] = null;
+        table[0][4] = null;
+
+
+        table[1][0] = "abc";
+        table[1][1] = "abc";
+        table[1][2] = "abc";
+        table[1][3] = "abc";
+        table[1][4] = "abc";
+
+
+        table[2][0] = "abc";
+        table[2][1] = "abc";
+        table[2][2] = null;
+        table[2][3] = null;
+        table[2][4] = null;
+
+        writeXWPFDocument(table);
     }
 
 
@@ -822,6 +859,71 @@ public class WordDemo {
                 }
             }
         }
+    }
+
+
+
+    private static  void setTableWidth(XWPFTable table,String width){
+        CTTbl ttbl = table.getCTTbl();
+        CTTblPr tblPr = ttbl.getTblPr() == null ? ttbl.addNewTblPr() : ttbl.getTblPr();
+        CTTblWidth tblWidth = tblPr.isSetTblW() ? tblPr.getTblW() : tblPr.addNewTblW();
+        CTJc cTJc=tblPr.addNewJc();
+        cTJc.setVal(STJc.Enum.forString("center"));
+//        tblWidth.setW(new BigInteger(width));
+        tblWidth.setType(STTblWidth.DXA);
+    }
+
+
+    public static  XWPFDocument createTable(){
+        XWPFDocument xwpfDocument = new XWPFDocument();
+
+        //标题
+        XWPFParagraph titleMes = xwpfDocument.createParagraph();
+        titleMes.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun r1 = titleMes.createRun();
+        r1.setBold(true);
+        r1.setFontFamily("微软雅黑");
+        r1.setText("上级采用情况");//活动名称
+        r1.setFontSize(12);
+
+        XWPFParagraph second = xwpfDocument.createParagraph();
+        second.setAlignment(ParagraphAlignment.LEFT);
+        XWPFRun r2 = second.createRun();
+        r2.setBold(true);
+        r2.setFontFamily("微软雅黑");
+        r2.setText("                        时间范围");//活动名称
+        r2.setFontSize(8);
+
+        r2.setColor("777777");
+//        r1.setBold(true);
+        return xwpfDocument;
+    }
+
+
+
+    public static void setTitleRow(XWPFTableCell cell ){
+
+
+
+
+        CTP ctp = CTP.Factory.newInstance();
+        XWPFParagraph p = new XWPFParagraph(ctp, cell);
+        p.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun run = p.createRun();
+        run.setColor("000000");
+        run.setFontSize(10);
+        run.setText("abc");
+        CTRPr rpr = run.getCTR().isSetRPr() ? run.getCTR().getRPr() : run.getCTR().addNewRPr();
+        CTFonts fonts = rpr.isSetRFonts() ? rpr.getRFonts() : rpr.addNewRFonts();
+        fonts.setAscii("微软雅黑");
+        fonts.setEastAsia("微软雅黑");
+        fonts.setHAnsi("微软雅黑");
+        cell.setParagraph(p);
+        cell.setColor("DDDDDD");
+
+
+
+
     }
 
 
