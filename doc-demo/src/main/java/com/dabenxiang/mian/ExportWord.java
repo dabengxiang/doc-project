@@ -114,7 +114,7 @@ public class ExportWord {
             setCellText(xdoc,getCellHight(xTable, i, 1), "种类细则"+i);
             setCellText(xdoc,getCellHight(xTable, i, 2), ""+i);
             setCellText(xdoc,getCellHight(xTable, i, 3), ""+i);
-            setCellText(xdoc,getCellHight(xTable, i, 4), "三度空间阿萨德妇女节开发四季的风");
+            setCellText(xdoc,getCellHight(xTable, i, 4), "gg");
         }
         mergeCellHorizontally(xTable, 8, 0, 3);
         mergeCellHorizontally(xTable, 8, 3, 4);

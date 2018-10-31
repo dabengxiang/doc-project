@@ -35,8 +35,9 @@ public class WordDemo {
     }
 
 
-
-
+    public XWPFDocument getDoc() {
+        return doc;
+    }
 
     public void init() throws IOException {
         is = new FileInputStream(new File(this.templatePath));

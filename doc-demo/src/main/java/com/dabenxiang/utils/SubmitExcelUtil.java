@@ -1,5 +1,8 @@
 package com.dabenxiang.utils;
 
+import com.dabenxiang.properties.MergeProperties;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -8,14 +11,17 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 
+
+
+
 /**
  * Date:2018/10/13
  * Author: yc.guo the one whom in nengxun
  * Desc:
  */
-public class SubmitUtil1 {
+public class SubmitExcelUtil {
 
-    public static boolean createExcel(String targetFilePath,String[][] table) {
+    public static boolean createExcel(String targetFilePath, String[][] table, List<MergeProperties> mergeList) {
         Workbook wb = new XSSFWorkbook();
         Font titleFont = wb.createFont();
         CellStyle titleStyle = getDefaultCellStyle(wb);
@@ -43,11 +49,13 @@ public class SubmitUtil1 {
         sheet.setColumnWidth(4,10 * 256);
 
 
+        for (MergeProperties mergeProperties : mergeList) {
+            CellRangeAddress cra1 =new CellRangeAddress(mergeProperties.getStartRow(),
+                    mergeProperties.getEndRow(), mergeProperties.getStartCol(), mergeProperties.getEndCol());
 
-//        CellRangeAddress cra1 =new CellRangeAddress(0, 0, 0, 3); // 起始行, 终止行, 起始列, 终止列
-//        CellRangeAddress cra2 =new CellRangeAddress(3, 3, 1, 3); // 起始行, 终止行, 起始列, 终止列
-//        CellRangeAddress cra3 =new CellRangeAddress(8, 8, 1, 3); // 起始行, 终止行, 起始列, 终止列
-//
+            sheet.addMergedRegion(cra1);
+        }
+
 //
 //        sheet.addMergedRegion(cra1);
 //        sheet.addMergedRegion(cra2);
@@ -56,28 +64,16 @@ public class SubmitUtil1 {
 
         for (int i = 0; i < table.length; i++) {
             Row row = sheet.createRow(i);
-            if(i==0){
-                row.setHeightInPoints(50);
-            }else {
-                row.setHeightInPoints(40);
-
-            }
+            row.setHeightInPoints(40);
 
             boolean flag = false;
 
             for (int j = 0; j < 5; j++) {
                 Cell cell = row.createCell(j);
-                    cell.setCellStyle(keyCellStyle);
-                if(table[i][j] == null){
-                    if(flag)
-                        continue;
-                    else{
-                        CellRangeAddress cra =new CellRangeAddress(i, i, j-1, table[i].length-1); // 起始行, 终止行, 起始列, 终止列
-                        sheet.addMergedRegion(cra);
-                        flag = true;
-                    }
-                    continue;
-                }
+
+                cell.setCellStyle(keyCellStyle);
+
+
                 if(i==0){
                     cell.setCellStyle(titleStyle);
                     cell.setCellValue(table[0][0]);
@@ -131,7 +127,7 @@ public class SubmitUtil1 {
     public static void main(String[] args) {
 
 
-        String[][] table = new String[3][5];
+        String[][] table = new String[5][5];
 
 
         table[0][0] = "上级采用情况";
@@ -155,6 +151,20 @@ public class SubmitUtil1 {
         table[2][3] = "abc";
         table[2][4] = "abc";
 
+        table[3][0] = "abc";
+        table[3][1] = "abc";
+        table[3][2] = "abc";
+        table[3][3] = "abc";
+        table[3][4] = "abc";
+
+
+        table[4][0] = "abc";
+        table[4][1] = "abc";
+        table[4][2] = "abc";
+        table[4][3] = "abc";
+        table[4][4] = "abc";
+
+
 
 
 //        List<String> list = new ArrayList<>();
@@ -176,7 +186,17 @@ public class SubmitUtil1 {
 //        String path =  "C:\\Users\\dabenxiang\\Desktop\\导出单个活动的数据.xlsx";
         String path2 =  "C:\\Users\\dabenxiang\\Desktop\\1.xlsx";
 //        replaceModel(item, path, path2);
-        createExcel(path2,table);
+
+        List<MergeProperties> mergeList = new ArrayList<>();
+
+        MergeProperties mergeProperties1 = new MergeProperties(2, 3, 1, 1);
+
+        MergeProperties mergeProperties2 = new MergeProperties(0, 0, 0, table[0].length-1);
+
+        mergeList.add(mergeProperties1);
+        mergeList.add(mergeProperties2);
+
+        createExcel(path2,table,mergeList);
 
     }
 
